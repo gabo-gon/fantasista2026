@@ -23,9 +23,16 @@ document.addEventListener('DOMContentLoaded', function() {
   const pageFlip = new St.PageFlip(
     document.getElementById('comic-reader'),
     {
-      width: 600,   // base page width
-      height: 800,  // base page height
-      size: 'fixed',
+      width: 600,         // base aspect ratio width
+	        height: 800,        // base aspect ratio height
+	        size: 'stretch',    // automatically scales to fit container width/height
+	        minWidth: 300,      // minimum mobile page width
+	        maxWidth: 1000,     // maximum desktop page width
+	        minHeight: 400,     // minimum mobile page height
+	        maxHeight: 1300,    // maximum desktop page height
+	        showCover: false,   // maintains double page spread with left blank page
+	        autoSize: true,     // auto updates layout when window resizes
+      useMouseEvents: true,
       showCover: true // renders Page 1 as single cover
     }
   );
@@ -37,15 +44,10 @@ document.addEventListener('DOMContentLoaded', function() {
 <body>
 <div id="comic-reader">
 <div class="page"><img src="Cover.png" alt="Invasion"></div>
-<div class="page blank-page"></div>
   <div class="page"><img src="Page_1.png" alt="Invasion"></div>
-<div class="page blank-page"></div>
   <div class="page"><img src="Page_2.png" alt="Counterattack"></div>
-<div class="page blank-page"></div>
   <div class="page"><img src="Page_3.png" alt="Victory"></div>
-<div class="page blank-page"></div>
   <div class="page"><img src="Page_4.png" alt="Preparation"></div>
-<div class="page blank-page"></div>
   <div class="page"><img src="Page_5.png" alt="Epilogue"></div>
 </div>
 </body>
