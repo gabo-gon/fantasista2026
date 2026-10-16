@@ -1,3 +1,9 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IVReD - Alien Invasion story</title>
 <script src="https://cdn.jsdelivr.net/npm/page-flip@2.0.7/dist/js/page-flip.browser.js"></script>
 <style>
 #comic-reader {
@@ -12,19 +18,6 @@
   background-color: #f9f9f9; /* or #000 depending on your reader background */
 }
 </style>
-<div id="comic-reader">
-<div class="page"><img src="Cover.png" alt="Invasion"></div>
-<div class="page blank-page"></div>
-  <div class="page"><img src="Page_1.png" alt="Invasion"></div>
-<div class="page blank-page"></div>
-  <div class="page"><img src="Page_2.png" alt="Counterattack"></div>
-<div class="page blank-page"></div>
-  <div class="page"><img src="Page_3.png" alt="Victory"></div>
-<div class="page blank-page"></div>
-  <div class="page"><img src="Page_4.png" alt="Preparation"></div>
-<div class="page blank-page"></div>
-  <div class="page"><img src="Page_5.png" alt="Epilogue"></div>
-</div>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
   const pageFlip = new St.PageFlip(
@@ -40,3 +33,20 @@ document.addEventListener('DOMContentLoaded', function() {
   pageFlip.loadFromHTML(document.querySelectorAll('.page'));
 });
 </script>
+</head>
+<body>
+<div id="comic-reader">
+<div class="page"><img src="Cover.png" alt="Invasion"></div>
+<div class="page blank-page"></div>
+  <div class="page"><img src="Page_1.png" alt="Invasion"></div>
+<div class="page blank-page"></div>
+  <div class="page"><img src="Page_2.png" alt="Counterattack"></div>
+<div class="page blank-page"></div>
+  <div class="page"><img src="Page_3.png" alt="Victory"></div>
+<div class="page blank-page"></div>
+  <div class="page"><img src="Page_4.png" alt="Preparation"></div>
+<div class="page blank-page"></div>
+  <div class="page"><img src="Page_5.png" alt="Epilogue"></div>
+</div>
+</body>
+</html>
