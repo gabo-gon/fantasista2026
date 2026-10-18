@@ -56,42 +56,43 @@
   <h2>Dengue Virus Envelope Dimer</h2>
 
   <div class="controls">
-    <button onclick="switchModel('DimerInterface.glb')">Wild-Type Dimer</button>
-    <button onclick="switchModel('DimerInterface.glb')">Stabilized Mutant</button>
-    <button onclick="switchModel('DimerInterface.glb')">Flexibility Map</button>
+    <button onclick="switchModel('EnvelopeDimer.glb')">Envelope Dimer</button>
+    <button onclick="switchModel('FusionLoop.glb')">Fusion Loop</button>
+    <button onclick="switchModel('DimerInterface.glb')">Dimer Interface</button>
   </div>
 
-  <model-viewer 
-  id="proteinViewer"
-  src="dengue_wt.glb" 
-  alt="3D Dengue Protein Structure"
-  ar 
-  ar-modes="webxr scene-viewer quick-look" 
-  ar-scale="auto"
-  scale="0.2 0.2 0.2"
-  camera-controls 
-  auto-rotate>
-  
-  <!-- This button triggers the real-world camera overlay -->
-  <button slot="ar-button" style="
-    position: absolute;
-    bottom: 16px;
-    left: 50%;
-    transform: translateX(-50%);
-    background-color: #28a745;
-    color: white;
-    border: none;
-    padding: 12px 24px;
-    font-size: 16px;
-    font-weight: bold;
-    border-radius: 24px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-    cursor: pointer;
-    z-index: 999;
-  ">
-    📷 View in Your Room (AR)
-  </button>
+  <model-viewer
+    id="proteinViewer"
+    src="EnvelopeDimer.glb"
+    alt="3D Dengue Protein Structure"
+    ar
+    ar-modes="webxr scene-viewer quick-look"
+    ar-scale="auto"
+    scale="0.2 0.2 0.2"
+    camera-controls
+    auto-rotate>
+
+    <!-- This button triggers the real-world camera overlay -->
+    <button slot="ar-button" style="
+      position: absolute;
+      bottom: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: #28a745;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      font-size: 16px;
+      font-weight: bold;
+      border-radius: 24px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+      cursor: pointer;
+      z-index: 999;
+    ">
+      📷 View in Your Room (AR)
+    </button>
 </model-viewer>
+
   <script>
     function switchModel(filename) {
       const viewer = document.getElementById('proteinViewer');
