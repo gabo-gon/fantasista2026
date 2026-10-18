@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IVReD - Dengue Virus 2 - Envelope Dimer</title>
+</head>
+<body>
+<div class="controls">
+  <button onclick="document.querySelector('model-viewer').src='DimerInterface.glb'">Dimer Interface</button>
+  <button onclick="document.querySelector('model-viewer').src='DimerInterface.glb'">Envelope Dimer</button>
+  <button onclick="document.querySelector('model-viewer').src='DimerInterface.glb'">Fusion Loop</button>
+</div>
+
+<model-viewer
+  src="DimerInterface.glb"
+  ar
+  ar-modes="webxr scene-viewer quick-look"
+  camera-controls
+  auto-rotate>
+</model-viewer>
+</body>
+</html>
