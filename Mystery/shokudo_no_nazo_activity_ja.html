@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>食堂の謎｜ミステリー・フード・ディテクティブ</title>
+<style>
+  :root {
+    --navy:#173b68; --blue:#5bb8f5; --sky:#eaf6ff; --yellow:#ffd45c;
+    --green:#8bd29a; --coral:#ff927f; --ink:#20324b; --paper:#fffdf8;
+    --pink:#ffe8ed; --line:#d7e7f5;
+  }
+  * { box-sizing:border-box; }
+  body {
+    margin:0; color:var(--ink);
+    font-family: "Yu Gothic", "Hiragino Kaku Gothic ProN", Meiryo, sans-serif;
+    background: radial-gradient(circle at 10% 0%, #fff1b9 0, transparent 26%),
+                radial-gradient(circle at 95% 12%, #d8f4e3 0, transparent 25%), #f2f8ff;
+    line-height:1.7;
+  }
+  .wrap { width:min(1100px, 94vw); margin:0 auto; padding:28px 0 48px; }
+  .hero {
+    position:relative; overflow:hidden; padding:30px clamp(20px,5vw,56px);
+    background:linear-gradient(125deg,#173b68,#286ca2); color:white;
+    border-radius:28px; box-shadow:0 12px 28px #163a6326;
+  }
+  .hero:after { content:"🔎"; position:absolute; right:34px; top:22px; font-size:clamp(42px,8vw,78px); transform:rotate(-12deg); }
+  .eyebrow { font-weight:800; letter-spacing:.12em; color:#ffe17a; font-size:.88rem; }
+  h1 { margin:.15em 85px .2em 0; font-size:clamp(2rem,5vw,3.2rem); line-height:1.2; }
+  .subtitle { margin:0; font-size:clamp(1rem,2.4vw,1.25rem); color:#e5f4ff; font-weight:700; }
+  .intro { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin:20px 0 26px; }
+  .intro-card { background:white; border:2px solid var(--line); border-radius:18px; padding:16px 18px; box-shadow:0 5px 12px #183b5c0b; }
+  .intro-card .emoji { font-size:1.7rem; display:block; }
+  .intro-card p { margin:5px 0 0; }
+  .section-title { display:flex; align-items:center; gap:10px; margin:28px 0 12px; font-size:1.45rem; color:var(--navy); }
+  .section-title span { display:inline-grid; place-items:center; width:38px; height:38px; border-radius:12px; background:var(--yellow); }
+  .chart-card { background:white; border-radius:22px; padding:clamp(10px,2vw,20px); border:2px solid #cde8fb; box-shadow:0 8px 22px #173b6812; }
+  .chart-card img { display:block; width:100%; height:auto; border-radius:12px; }
+  .caption { text-align:center; color:#52708e; font-size:.9rem; margin:10px 0 0; }
+  .mission { background:#fff7d8; border:2px dashed #f2c84b; padding:18px 22px; border-radius:18px; }
+  .mission strong { color:#8a5a00; }
+  .steps { display:grid; grid-template-columns:repeat(3,1fr); gap:15px; margin-top:14px; }
+  .step { background:white; border-radius:20px; padding:19px; border:2px solid var(--line); box-shadow:0 6px 16px #173b680b; }
+  .step:nth-child(1) { border-top:7px solid var(--blue); }
+  .step:nth-child(2) { border-top:7px solid var(--green); }
+  .step:nth-child(3) { border-top:7px solid var(--coral); }
+  .step-no { font-size:.85rem; font-weight:900; letter-spacing:.08em; color:#54728e; }
+  .step h3 { margin:4px 0 8px; color:var(--navy); font-size:1.18rem; }
+  .step p { margin:0 0 12px; }
+  .field-label { display:block; font-weight:800; margin:10px 0 5px; }
+  input[type="text"], textarea {
+    width:100%; border:2px solid #d7e4f0; border-radius:12px; padding:11px 12px;
+    font:inherit; color:var(--ink); background:#fbfdff;
+  }
+  textarea { min-height:84px; resize:vertical; }
+  .day-picks { display:grid; grid-template-columns:repeat(4,1fr); gap:7px; }
+  .day-picks label {
+    display:flex; gap:6px; align-items:center; justify-content:center; padding:8px 4px;
+    background:#f2f8ff; border:1px solid #d6e8f7; border-radius:10px; font-weight:700;
+  }
+  input[type="checkbox"] { accent-color:#e83e67; width:17px; height:17px; }
+  .actions { display:flex; flex-wrap:wrap; gap:10px; margin-top:18px; }
+  button { cursor:pointer; border:0; border-radius:13px; padding:12px 18px; font:inherit; font-weight:900; }
+  .primary { background:var(--navy); color:white; box-shadow:0 4px 0 #102c50; }
+  .secondary { background:#e5f2ff; color:var(--navy); }
+  button:hover { filter:brightness(1.04); transform:translateY(-1px); }
+  .result { display:none; margin-top:18px; background:#e8f8ee; border:2px solid #9ddbb0; border-radius:18px; padding:18px 20px; }
+  .result h3 { margin:0 0 6px; color:#176b43; }
+  .note { margin-top:20px; padding:14px 17px; background:#f0ebff; border-radius:15px; color:#51437b; font-size:.94rem; }
+  footer { text-align:center; margin-top:24px; color:#67809a; font-size:.85rem; }
+  @media(max-width:760px) {
+    .intro,.steps { grid-template-columns:1fr; }
+    .hero:after { right:18px; top:18px; opacity:.9; }
+    .day-picks { grid-template-columns:repeat(2,1fr); }
+  }
+  @media print {
+    body { background:white; } .wrap { width:100%; } .hero,.intro-card,.chart-card,.step { box-shadow:none; }
+    .actions, .result, footer { display:none !important; }
+  }
+</style>
+</head>
+<body>
+<main class="wrap">
+  <header class="hero">
+    <div class="eyebrow">FOOD MYSTERY CASE FILE</div>
+    <h1>食堂の謎</h1>
+    <p class="subtitle">ミステリー・フード・ディテクティブ — お腹の不調の原因を探せ！</p>
+  </header>
+
+  <section class="intro" aria-label="ストーリー">
+    <article class="intro-card"><span class="emoji">🤕</span><strong>事件発生</strong><p>デニスは昼食後、週に2〜3回、強い腹痛と疲労を感じます。</p></article>
+    <article class="intro-card"><span class="emoji">🩺</span><strong>手がかりを集める</strong><p>医師は、食べたものと体調を記録する「食事日記」をつけるよう勧めました。</p></article>
+    <article class="intro-card"><span class="emoji">🧩</span><strong>探偵ミッション</strong><p>7日間・20種類の食事。一見バラバラな記録から、共通点を見つけよう！</p></article>
+  </section>
+
+  <h2 class="section-title"><span>🍽️</span>手がかりファイル：デニスの1週間</h2>
+  <section class="chart-card">
+    <img src="Japanese_Weekly_Meal_Plan_Chart.png" alt="曜日ごとの朝食・昼食・午後の体調・夕食をまとめた週間食事表">
+    <p class="caption">表をよく観察し、体調が悪かった日と元気だった日を比べよう。</p>
+  </section>
+
+  <h2 class="section-title"><span>🧠</span>AI判定アルゴリズムをまねして考えよう</h2>
+  <section class="mission">
+    <strong>あなたのミッション：</strong> 3つのルールに沿って記録を整理し、腹痛の原因かもしれない食材のパターンを見つけよう。<br>
+    <small>※これは推理の練習です。食事記録だけでアレルギーや病気を確定することはできません。</small>
+  </section>
+
+  <section class="steps">
+    <article class="step">
+      <div class="step-no">STEP 01</div>
+      <h3>体調が悪い日を選ぶ</h3>
+      <p>午後の体調が「強い腹痛」になっている曜日をすべて選び、丸で囲むつもりでチェックしよう。</p>
+      <div class="day-picks">
+        <label><input type="checkbox" name="day" value="月">月曜日</label>
+        <label><input type="checkbox" name="day" value="火">火曜日</label>
+        <label><input type="checkbox" name="day" value="水">水曜日</label>
+        <label><input type="checkbox" name="day" value="木">木曜日</label>
+        <label><input type="checkbox" name="day" value="金">金曜日</label>
+        <label><input type="checkbox" name="day" value="土">土曜日</label>
+        <label><input type="checkbox" name="day" value="日">日曜日</label>
+      </div>
+    </article>
+    <article class="step">
+      <div class="step-no">STEP 02</div>
+      <h3>食材を照らし合わせる</h3>
+      <p>腹痛が起きた日の食事を確認し、複数の日にくり返し登場する食材を書き出そう。</p>
+      <label class="field-label" for="ingredients">くり返し登場する食材</label>
+      <textarea id="ingredients" placeholder="例：小麦、卵、アボカド……"></textarea>
+    </article>
+    <article class="step">
+      <div class="step-no">STEP 03</div>
+      <h3>隠れたパターンを探す</h3>
+      <p>腹痛があった<strong>すべての日</strong>に含まれ、元気だった日にはあまり登場しない食材があるか考えよう。</p>
+      <label class="field-label" for="candidate">原因かもしれない食材</label>
+      <input type="text" id="candidate" placeholder="仮説を書こう">
+      <label class="field-label" for="reason">そう考えた理由</label>
+      <textarea id="reason" placeholder="どの日に登場した？ 元気な日とどう違う？"></textarea>
+    </article>
+  </section>
+
+  <div class="actions">
+    <button class="primary" type="button" onclick="checkWork()">🔍 推理をまとめる</button>
+    <button class="secondary" type="button" onclick="window.print()">🖨️ 印刷する</button>
+    <button class="secondary" type="button" onclick="resetWork()">↻ 最初から</button>
+  </div>
+  <section class="result" id="result" aria-live="polite">
+    <h3>🕵️ 探偵メモ</h3>
+    <p id="resultText"></p>
+    <p><strong>大切なポイント：</strong>食材が同じ日に登場したことは、原因である証拠とは限りません。食事の量、調理法、食べてから症状が出るまでの時間なども調べ、実際の診断は医療専門家に任せましょう。</p>
+  </section>
+  <aside class="note">💡 <strong>考えるヒント：</strong>「腹痛の日に食べたもの」だけでなく、「元気な日にも食べたもの」に注目すると、候補をしぼりやすくなります。</aside>
+  <footer>食事日記を使った観察・仮説づくりの学習アクティビティ</footer>
+</main>
+<script>
+function checkWork() {
+  const days = Array.from(document.querySelectorAll('input[name="day"]:checked')).map(x => x.value);
+  const candidate = document.getElementById('candidate').value.trim();
+  const reason = document.getElementById('reason').value.trim();
+  const ingredients = document.getElementById('ingredients').value.trim();
+  const result = document.getElementById('result');
+  const resultText = document.getElementById('resultText');
+  let message = '';
+  if (days.length) {
+    message += '選んだ曜日：' + days.join('・') + '曜日。';
+  } else {
+    message += 'まず、表で「強い腹痛」の曜日を確認してチェックしてみましょう。';
+  }
+  if (ingredients) message += ' 繰り返し食材のメモを記入できました。';
+  if (candidate) message += ' あなたの候補は「' + candidate.replace(/[<>]/g, '') + '」です。';
+  if (reason) message += ' 理由も記録できました。';
+  message += ' 表の情報と照らし合わせ、見落とした曜日や例外がないか再確認しましょう。';
+  resultText.textContent = message;
+  result.style.display = 'block';
+  result.scrollIntoView({behavior:'smooth', block:'nearest'});
+}
+function resetWork() {
+  document.querySelectorAll('input[name="day"]').forEach(x => x.checked = false);
+  document.getElementById('ingredients').value = '';
+  document.getElementById('candidate').value = '';
+  document.getElementById('reason').value = '';
+  document.getElementById('result').style.display = 'none';
+}
+</script>
+</body>
+</html>
