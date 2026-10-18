@@ -61,16 +61,36 @@
     <button onclick="switchModel('DimerInterface.glb')">Flexibility Map</button>
   </div>
 
-  <model-viewer
-    id="proteinViewer"
-    src="DimerInterface.glb"
-    alt="3D Dengue Protein Structure"
-    ar
-    ar-modes="webxr scene-viewer quick-look"
-    camera-controls
-    auto-rotate>
-  </model-viewer>
-
+  <model-viewer 
+  id="proteinViewer"
+  src="dengue_wt.glb" 
+  alt="3D Dengue Protein Structure"
+  ar 
+  ar-modes="webxr scene-viewer quick-look" 
+  ar-scale="auto"
+  camera-controls 
+  auto-rotate>
+  
+  <!-- This button triggers the real-world camera overlay -->
+  <button slot="ar-button" style="
+    position: absolute;
+    bottom: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #28a745;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: 24px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    cursor: pointer;
+    z-index: 999;
+  ">
+    📷 View in Your Room (AR)
+  </button>
+</model-viewer>
   <script>
     function switchModel(filename) {
       const viewer = document.getElementById('proteinViewer');
