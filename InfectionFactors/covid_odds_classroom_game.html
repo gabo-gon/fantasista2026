@@ -380,27 +380,28 @@ a{color:#1f56c4}
 		    // Rank the sorted combination from 1 to 126.
 		    // Lexicographic order: 1-1-1-1 ... 6-6-6-6.
 		    function combinationRank(d) {
-		      let rank = 1;
-		      for (let i = 0; i < 4; i++) {
-		        for (let face = 1; face < d[i]; face++) {
-		          const remaining = 3 - i;
-		          const minFace = face;
-		          const maxFace = 6;
-		          // Count valid nondecreasing combinations after this smaller face.
-		          function countCombinations(min, slots) {
-		            if (slots === 0) return 1;
-		            let count = 0;
-		            for (let x = min; x <= 6; x++) {
-		              count += countCombinations(x, slots - 1);
-		            }
-		            return count;
-		          }
-		          rank += countCombinations(minFace, remaining);
-		        }
-		      }
-		      return rank;
-		    }
+  let rank = 1;
 
+  function countCombinations(minFace, slots) {
+    if (slots === 0) return 1;
+
+    let count = 0;
+    for (let face = minFace; face <= 6; face++) {
+      count += countCombinations(face, slots - 1);
+    }
+    return count;
+  }
+
+  for (let i = 0; i < 4; i++) {
+    const minAllowed = i === 0 ? 1 : d[i - 1];
+
+    for (let face = minAllowed; face < d[i]; face++) {
+      rank += countCombinations(face, 3 - i);
+    }
+  }
+
+  return rank;
+}
 		    const rank = combinationRank(sortedDice);
 		    const score = ((rank - 1) / 125) * 100;
 
