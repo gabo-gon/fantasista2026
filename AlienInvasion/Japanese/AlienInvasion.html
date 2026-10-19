@@ -264,7 +264,7 @@ document.addEventListener('DOMContentLoaded', function() {
       let scale = 1;
       let offsetX = 0;
       let offsetY = 0;
-      let dragging = true;
+      let dragging = false;
       let startX = 0;
       let startY = 0;
       let lastX = 0;
@@ -439,140 +439,174 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Drag to inspect details when zoomed in.
 
-	  // ---- Drag and pinch-to-zoom ----
-	  const activePointers = new Map();
+		// ---- Drag and pinch-to-zoom ----
+	    // ---- Smooth drag and pinch-to-zoom ----
+	    const activePointers = new Map();
 
-	  let pinchStartDistance = 0;
-	  let pinchStartScale = 1;
-	  let pinchStartOffsetX = 0;
-	  let pinchStartOffsetY = 0;
-	  let pinchStartMidX = 0;
-	  let pinchStartMidY = 0;
+	    let pinchStartDistance = 0;
+	    let pinchStartScale = 1;
+	    let pinchStartOffsetX = 0;
+	    let pinchStartOffsetY = 0;
+	    let pinchStartMidX = 0;
+	    let pinchStartMidY = 0;
+	    let pinchCenterX = 0;
+	    let pinchCenterY = 0;
 
-	  function getPointerDistance(a, b) {
-	    return Math.hypot(a.x - b.x, a.y - b.y);
-	  }
-
-	  function getPointerMidpoint(a, b) {
-	    return {
-	      x: (a.x + b.x) / 2,
-	      y: (a.y + b.y) / 2
-	    };
-	  }
-
-	  function startPinch() {
-	    const points = [...activePointers.values()];
-	    if (points.length < 2) return;
-
-	    pinchStartDistance = getPointerDistance(points[0], points[1]);
-	    pinchStartScale = scale;
-	    pinchStartOffsetX = offsetX;
-	    pinchStartOffsetY = offsetY;
-
-	    const midpoint = getPointerMidpoint(points[0], points[1]);
-	    pinchStartMidX = midpoint.x;
-	    pinchStartMidY = midpoint.y;
-	  }
-
-	  zoomImage.addEventListener('pointerdown', event => {
-	    event.preventDefault();
-
-	    zoomImage.setPointerCapture(event.pointerId);
-
-	    activePointers.set(event.pointerId, {
-	      x: event.clientX,
-	      y: event.clientY
-	    });
-
-	    if (activePointers.size === 2) {
-	      startPinch();
-	    } else if (activePointers.size === 1) {
-	      startX = event.clientX;
-	      startY = event.clientY;
-	      lastX = offsetX;
-	      lastY = offsetY;
+	    function getPointerDistance(a, b) {
+	      return Math.hypot(a.x - b.x, a.y - b.y);
 	    }
-	  });
 
-	  zoomImage.addEventListener('pointermove', event => {
-	    if (!activePointers.has(event.pointerId)) return;
+	    function getPointerMidpoint(a, b) {
+	      return {
+	        x: (a.x + b.x) / 2,
+	        y: (a.y + b.y) / 2
+	      };
+	    }
 
-	    activePointers.set(event.pointerId, {
-	      x: event.clientX,
-	      y: event.clientY
+	    // The image original layout center, excluding its current translation.
+	    function getImageCenter() {
+	      const rect = zoomImage.getBoundingClientRect();
+
+	      return {
+	        x: rect.left + rect.width / 2 - offsetX,
+	        y: rect.top + rect.height / 2 - offsetY
+	      };
+	    }
+
+	    function startPinch() {
+	      const points = [...activePointers.values()];
+	      if (points.length < 2) return;
+
+	      pinchStartDistance = getPointerDistance(points[0], points[1]);
+	      if (pinchStartDistance === 0) return;
+
+	      pinchStartScale = scale;
+	      pinchStartOffsetX = offsetX;
+	      pinchStartOffsetY = offsetY;
+
+	      const midpoint = getPointerMidpoint(points[0], points[1]);
+	      pinchStartMidX = midpoint.x;
+	      pinchStartMidY = midpoint.y;
+
+	      const center = getImageCenter();
+	      pinchCenterX = center.x;
+	      pinchCenterY = center.y;
+	    }
+
+	    zoomImage.addEventListener('pointerdown', event => {
+	      event.preventDefault();
+
+	      try {
+	        zoomImage.setPointerCapture(event.pointerId);
+	      } catch (_) {
+	        // Continue if pointer capture is unavailable.
+	      }
+
+	      activePointers.set(event.pointerId, {
+	        x: event.clientX,
+	        y: event.clientY
+	      });
+
+	      if (activePointers.size === 2) {
+	        // Two fingers: begin a new pinch gesture.
+	        startPinch();
+	      } else if (activePointers.size === 1) {
+	        // One finger or mouse: prepare to drag.
+	        startX = event.clientX;
+	        startY = event.clientY;
+	        lastX = offsetX;
+	        lastY = offsetY;
+	      }
 	    });
 
-	    const points = [...activePointers.values()];
+	    zoomImage.addEventListener('pointermove', event => {
+	      if (!activePointers.has(event.pointerId)) return;
 
-	    if (points.length >= 2) {
-	      // Two fingers: pinch to zoom.
-	      const distance = getPointerDistance(points[0], points[1]);
-	      const midpoint = getPointerMidpoint(points[0], points[1]);
+	      event.preventDefault();
 
-	      if (pinchStartDistance > 0) {
-	        const oldScale = scale;
+	      activePointers.set(event.pointerId, {
+	        x: event.clientX,
+	        y: event.clientY
+	      });
 
-	        scale = Math.min(
-	          MAX_ZOOM,
-	          Math.max(
-	            MIN_ZOOM,
-	            pinchStartScale * distance / pinchStartDistance
-	          )
-	        );
+	      const points = [...activePointers.values()];
 
-	        // Keep the zoom centered around the fingers.
-	        const ratio = scale / pinchStartScale;
+	      if (points.length >= 2) {
+	        // PINCH: zoom around the midpoint between the fingers.
+	        const distance = getPointerDistance(points[0], points[1]);
+	        const midpoint = getPointerMidpoint(points[0], points[1]);
 
-	        offsetX =
-	          midpoint.x - pinchStartMidX +
-	          ratio * pinchStartOffsetX;
+	        if (pinchStartDistance > 0) {
+	          const newScale = Math.min(
+	            MAX_ZOOM,
+	            Math.max(
+	              MIN_ZOOM,
+	              pinchStartScale * distance / pinchStartDistance
+	            )
+	          );
 
-	        offsetY =
-	          midpoint.y - pinchStartMidY +
-	          ratio * pinchStartOffsetY;
+	          const ratio = newScale / pinchStartScale;
 
-	        if (scale === MIN_ZOOM) {
-	          offsetX = 0;
-	          offsetY = 0;
+	          // Keep the content under the fingers in the same place.
+	          scale = newScale;
+
+	          offsetX =
+	            midpoint.x - pinchCenterX -
+	            ratio * (pinchStartMidX - pinchCenterX - pinchStartOffsetX);
+
+	          offsetY =
+	            midpoint.y - pinchCenterY -
+	            ratio * (pinchStartMidY - pinchCenterY - pinchStartOffsetY);
+
+	          if (scale === MIN_ZOOM) {
+	            offsetX = 0;
+	            offsetY = 0;
+	          }
+
+	          dragging = false;
+	          updateZoom();
 	        }
+	      } else if (points.length === 1 && scale > MIN_ZOOM) {
+	        // DRAG: move the zoomed image to inspect its sides and corners.
+	        dragging = true;
+
+	        offsetX = lastX + event.clientX - startX;
+	        offsetY = lastY + event.clientY - startY;
 
 	        updateZoom();
 	      }
-	    } else if (points.length === 1 && scale > MIN_ZOOM) {
-	      // One finger: drag the enlarged image.
-	      offsetX = lastX + event.clientX - startX;
-	      offsetY = lastY + event.clientY - startY;
+	    });
+
+	    function endPointer(event) {
+	      if (!activePointers.has(event.pointerId)) return;
+
+	      activePointers.delete(event.pointerId);
+
+	      const remaining = [...activePointers.values()];
+
+	      if (remaining.length >= 2) {
+	        // Continue pinching with the remaining two pointers.
+	        startPinch();
+	      } else if (remaining.length === 1) {
+	        // Smoothly switch from pinch to one-finger dragging.
+	        startX = remaining[0].x;
+	        startY = remaining[0].y;
+	        lastX = offsetX;
+	        lastY = offsetY;
+	        pinchStartDistance = 0;
+	        dragging = false;
+	      } else {
+	        pinchStartDistance = 0;
+	        dragging = false;
+	      }
+
 	      updateZoom();
 	    }
-	  });
 
-	  function endPointer(event) {
-	    // Ignore duplicate pointerup/lostpointercapture events.
-	    if (!activePointers.has(event.pointerId)) return;
+	    zoomImage.addEventListener('pointerup', endPointer);
+	    zoomImage.addEventListener('pointercancel', endPointer);
+	    zoomImage.addEventListener('lostpointercapture', endPointer);
 
-	    activePointers.delete(event.pointerId);
-
-	    if (activePointers.size >= 2) {
-	      startPinch();
-	    } else if (activePointers.size === 1) {
-	      const remaining = [...activePointers.values()][0];
-	      startX = remaining.x;
-	      startY = remaining.y;
-	      lastX = offsetX;
-	      lastY = offsetY;
-	    } else {
-	      pinchStartDistance = 0;
-	    }
-
-	    dragging = false;
-	    updateZoom();
-	  }
-
-	  // Open the full-screen reader on the cover immediately.
-	openZoom(comicImages[0]);
-	zoomImage.addEventListener('pointerup', endPointer);
-	zoomImage.addEventListener('pointercancel', endPointer);
-	zoomImage.addEventListener('lostpointercapture', endPointer);
 });
 </script>
 </head>
