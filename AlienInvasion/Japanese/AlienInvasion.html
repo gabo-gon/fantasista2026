@@ -206,6 +206,37 @@
   cursor: not-allowed;
 }
 
+#comic-reader,
+#page-navigation {
+  display: none;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+}
+
+#zoom-viewer {
+  padding-top: max(8px, env(safe-area-inset-top));
+  padding-bottom: max(8px, env(safe-area-inset-bottom));
+}
+
+#zoom-image {
+  max-width: 100%;
+  max-height: 100%;
+}
+
+#zoom-thumbnails {
+  scrollbar-width: thin;
+}
+
+#zoom-controls button,
+#zoom-page-navigation button {
+  min-height: 44px;
+  min-width: 44px;
+}
+
 </style>
 
 <script>
@@ -226,6 +257,22 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   );
 
+  // ---- Comic page zoom viewer ----
+      const viewer = document.getElementById('zoom-viewer');
+      const zoomImage = document.getElementById('zoom-image');
+
+      let scale = 1;
+      let offsetX = 0;
+      let offsetY = 0;
+      let dragging = false;
+      let startX = 0;
+      let startY = 0;
+      let lastX = 0;
+      let lastY = 0;
+      let previousFocus = null;
+
+      const MIN_ZOOM = 1;
+      const MAX_ZOOM = 5;
 
     // ---- Zoom-viewer page navigation and thumbnails ----
     const comicImages = [...document.querySelectorAll('.page img')];
@@ -315,59 +362,6 @@ document.addEventListener('DOMContentLoaded', function() {
     updateZoomPageNavigation();
 
   pageFlip.loadFromHTML(document.querySelectorAll('.page'));
-
-
-    // ---- Comic page zoom viewer ----
-    const viewer = document.getElementById('zoom-viewer');
-    const zoomImage = document.getElementById('zoom-image');
-
-    let scale = 1;
-    let offsetX = 0;
-    let offsetY = 0;
-    let dragging = false;
-    let startX = 0;
-    let startY = 0;
-    let lastX = 0;
-    let lastY = 0;
-    let previousFocus = null;
-
-    const MIN_ZOOM = 1;
-    const MAX_ZOOM = 5;
-
-    function updateZoom() {
-      zoomImage.style.transform =
-        `translate(${offsetX}px, ${offsetY}px) scale(${scale})`;
-      zoomImage.classList.toggle('dragging', dragging);
-    }
-
-    function resetZoom() {
-      scale = 1;
-      offsetX = 0;
-      offsetY = 0;
-      updateZoom();
-    }
-
-    function changeZoom(amount) {
-      scale = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, scale + amount));
-
-      if (scale === 1) {
-        offsetX = 0;
-        offsetY = 0;
-      }
-
-      updateZoom();
-    }
-
-    function closeZoom() {
-	  viewer.classList.remove('active');
-	  zoomImage.src = '';
-	  dragging = false;
-	  resetZoom();
-
-	  if (previousFocus) {
-	    previousFocus.focus();
-	  }
-	}
 
     // Click any comic illustration to enlarge it.
     document.querySelectorAll('.page img').forEach(image => {
@@ -540,22 +534,11 @@ document.addEventListener('DOMContentLoaded', function() {
 	    updateZoom();
 	  }
 
-	  pageTurnButton.addEventListener('click', () => {
-	    const currentPage = pageFlip.getCurrentPageIndex();
-	    const totalPages = pageFlip.getPageCount();
-
-	    if (currentPage >= totalPages - 1) {
-	      pageFlip.flipPrev();
-	    } else {
-	      pageFlip.flipNext();
-	    }
-	  });
-
-	  // Update the button label whenever the page changes.
-	  pageFlip.on('flip', updatePageTurnButton);
-
-	  updatePageTurnButton();
-
+	  // Open the full-screen reader on the cover immediately.
+	openZoom(comicImages[0]);
+	zoomImage.addEventListener('pointerup', endPointer);
+	zoomImage.addEventListener('pointercancel', endPointer);
+	zoomImage.addEventListener('lostpointercapture', endPointer);
 });
 </script>
 </head>
