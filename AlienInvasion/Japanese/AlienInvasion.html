@@ -274,6 +274,40 @@ document.addEventListener('DOMContentLoaded', function() {
       const MIN_ZOOM = 1;
       const MAX_ZOOM = 5;
 
+
+	  function updateZoom() {
+	    zoomImage.style.transform =
+	      `translate(${offsetX}px, ${offsetY}px) scale(${scale})`;
+
+	    zoomImage.classList.toggle('dragging', dragging);
+	  }
+
+	  function resetZoom() {
+	    scale = 1;
+	    offsetX = 0;
+	    offsetY = 0;
+	    dragging = false;
+	    updateZoom();
+	  }
+
+	  function changeZoom(amount) {
+	    scale = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, scale + amount));
+
+	    if (scale === MIN_ZOOM) {
+	      offsetX = 0;
+	      offsetY = 0;
+	    }
+
+	    updateZoom();
+	  }
+
+	  function closeZoom() {
+	    // Keep the reader open in reading mode.
+	    // Reset the current page to its normal scale instead.
+	    resetZoom();
+	  }
+
+
     // ---- Zoom-viewer page navigation and thumbnails ----
     const comicImages = [...document.querySelectorAll('.page img')];
     const thumbnails = document.getElementById('zoom-thumbnails');
