@@ -264,7 +264,7 @@ document.addEventListener('DOMContentLoaded', function() {
       let scale = 1;
       let offsetX = 0;
       let offsetY = 0;
-      let dragging = false;
+      let dragging = true;
       let startX = 0;
       let startY = 0;
       let lastX = 0;
@@ -280,7 +280,7 @@ document.addEventListener('DOMContentLoaded', function() {
 	      `translate(${offsetX}px, ${offsetY}px) scale(${scale})`;
 
 	    zoomImage.classList.toggle('dragging', dragging);
-	  }
+	}
 
 	  function resetZoom() {
 	    scale = 1;
@@ -299,7 +299,7 @@ document.addEventListener('DOMContentLoaded', function() {
 	    }
 
 	    updateZoom();
-	  }
+	}
 
 	  function closeZoom() {
 	    // Keep the reader open in reading mode.
@@ -600,7 +600,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
   <div id="zoom-controls">
     <button id="zoom-out" type="button" aria-label="Zoom out">−</button>
-    <p>Zoom</p>
     <button id="zoom-in" type="button" aria-label="Zoom in">＋</button>
   </div>
 
