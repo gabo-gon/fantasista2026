@@ -5,19 +5,240 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>IVReD - Alien Invasion story</title>
 <script src="https://cdn.jsdelivr.net/npm/page-flip@2.0.7/dist/js/page-flip.browser.js"></script>
+
 <style>
 #comic-reader {
   margin: 20px auto;
 }
+
 .page img {
   width: 100%;
   height: 100%;
   object-fit: contain;
+  cursor: zoom-in;
 }
+
 .blank-page {
-  background-color: #f9f9f9; /* or #000 depending on your reader background */
+  background-color: #f9f9f9;
 }
+
+/* Full-screen zoom viewer */
+
+/* Full-screen zoom viewer with dedicated toolbar and footer */
+#zoom-viewer {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  background: rgba(8, 14, 24, 0.98);
+  grid-template-rows: auto minmax(0, 1fr) auto auto;
+  gap: 10px;
+  padding: 12px;
+  box-sizing: border-box;
+  overflow: hidden;
+  touch-action: none;
+}
+
+#zoom-viewer.active {
+  display: grid;
+}
+
+/* Keep controls outside the illustration */
+#zoom-controls {
+  position: relative;
+  inset: auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  z-index: 2;
+}
+
+#zoom-controls button,
+#zoom-page-navigation button {
+  color: white;
+  background: #263746;
+  border: 1px solid #78909c;
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+#zoom-controls button:hover,
+#zoom-page-navigation button:hover {
+  background: #145da0;
+}
+
+/* Reserve the central area for the page */
+#zoom-image {
+  display: block;
+  justify-self: center;
+  align-self: center;
+  max-width: 96%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  transform-origin: center center;
+  cursor: grab;
+  user-select: none;
+  -webkit-user-drag: none;
+  touch-action: none;
+}
+
+#zoom-image.dragging {
+  cursor: grabbing;
+}
+
+/* Thumbnail strip */
+#zoom-thumbnails {
+  display: flex;
+  justify-content: flex-start;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 8px 2px;
+  min-height: 76px;
+  box-sizing: border-box;
+  touch-action: pan-x;
+}
+
+#zoom-thumbnails button {
+  flex: 0 0 56px;
+  height: 70px;
+  padding: 2px;
+  background: #263746;
+  border: 2px solid transparent;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+#zoom-thumbnails button.active {
+  border-color: #ffd166;
+}
+
+#zoom-thumbnails img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+/* Previous/next controls in zoom mode */
+#zoom-page-navigation {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+}
+
+#zoom-page-indicator {
+  color: white;
+  font-size: 14px;
+  min-width: 70px;
+  text-align: center;
+}
+
+#zoom-help {
+  display: none;
+}
+
+@media (max-width: 600px) {
+  #zoom-viewer {
+    padding: 8px;
+    gap: 6px;
+  }
+
+  #zoom-controls button,
+  #zoom-page-navigation button {
+    padding: 9px 11px;
+    font-size: 14px;
+  }
+
+  #zoom-thumbnails {
+    min-height: 62px;
+  }
+
+  #zoom-thumbnails button {
+    flex-basis: 46px;
+    height: 56px;
+  }
+}
+
+#page-navigation {
+  text-align: center;
+  margin: 18px auto 30px;
+  padding: 0 12px;
+}
+
+#page-turn-button {
+  background: #145da0;
+  color: white;
+  border: none;
+  border-radius: 30px;
+  padding: 14px 30px;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  transition: background 0.2s, transform 0.2s;
+}
+
+#page-turn-button:hover {
+  background: #0b3d70;
+  transform: translateY(-2px);
+}
+
+#page-navigation p {
+  color: #555;
+  font-size: 14px;
+  margin-top: 8px;
+}
+
+#page-turn-button:focus-visible {
+  outline: 3px solid #f4b942;
+  outline-offset: 4px;
+}
+
+#zoom-page-navigation button:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+#comic-reader,
+#page-navigation {
+  display: none;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+}
+
+#zoom-viewer {
+  padding-top: max(8px, env(safe-area-inset-top));
+  padding-bottom: max(8px, env(safe-area-inset-bottom));
+}
+
+#zoom-image {
+  max-width: 100%;
+  max-height: 100%;
+}
+
+#zoom-thumbnails {
+  scrollbar-width: thin;
+}
+
+#zoom-controls button,
+#zoom-page-navigation button {
+  min-height: 44px;
+  min-width: 44px;
+}
+
 </style>
+
 <script>
 document.addEventListener('DOMContentLoaded', function() {
   const pageFlip = new St.PageFlip(
@@ -30,14 +251,328 @@ document.addEventListener('DOMContentLoaded', function() {
 	        maxWidth: 1000,     // maximum desktop page width
 	        minHeight: 400,     // minimum mobile page height
 	        maxHeight: 1300,    // maximum desktop page height
-	        showCover: false,   // maintains double page spread with left blank page
 	        autoSize: true,     // auto updates layout when window resizes
       useMouseEvents: true,
       showCover: true // renders Page 1 as single cover
     }
   );
 
+  // ---- Comic page zoom viewer ----
+      const viewer = document.getElementById('zoom-viewer');
+      const zoomImage = document.getElementById('zoom-image');
+
+      let scale = 1;
+      let offsetX = 0;
+      let offsetY = 0;
+      let dragging = false;
+      let startX = 0;
+      let startY = 0;
+      let lastX = 0;
+      let lastY = 0;
+      let previousFocus = null;
+
+      const MIN_ZOOM = 1;
+      const MAX_ZOOM = 5;
+
+
+	  function updateZoom() {
+	    zoomImage.style.transform =
+	      `translate(${offsetX}px, ${offsetY}px) scale(${scale})`;
+
+	    zoomImage.classList.toggle('dragging', dragging);
+	  }
+
+	  function resetZoom() {
+	    scale = 1;
+	    offsetX = 0;
+	    offsetY = 0;
+	    dragging = false;
+	    updateZoom();
+	  }
+
+	  function changeZoom(amount) {
+	    scale = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, scale + amount));
+
+	    if (scale === MIN_ZOOM) {
+	      offsetX = 0;
+	      offsetY = 0;
+	    }
+
+	    updateZoom();
+	  }
+
+	  function closeZoom() {
+	    // Keep the reader open in reading mode.
+	    // Reset the current page to its normal scale instead.
+	    resetZoom();
+	  }
+
+
+    // ---- Zoom-viewer page navigation and thumbnails ----
+    const comicImages = [...document.querySelectorAll('.page img')];
+    const thumbnails = document.getElementById('zoom-thumbnails');
+    const pageIndicator = document.getElementById('zoom-page-indicator');
+
+    let currentZoomIndex = 0;
+
+    function showZoomPage(index) {
+      if (index < 0 || index >= comicImages.length) return;
+
+      currentZoomIndex = index;
+      const image = comicImages[index];
+
+      zoomImage.src = image.src;
+      zoomImage.alt = image.alt || `Comic page ${index + 1}`;
+      resetZoom();
+      updateZoomPageNavigation();
+    }
+
+    function updateZoomPageNavigation() {
+      pageIndicator.textContent =
+        `${currentZoomIndex + 1} / ${comicImages.length}`;
+
+      document.getElementById('zoom-prev-page').disabled =
+        currentZoomIndex === 0;
+
+      document.getElementById('zoom-next-page').disabled =
+        currentZoomIndex === comicImages.length - 1;
+
+      [...thumbnails.children].forEach((button, index) => {
+        button.classList.toggle('active', index === currentZoomIndex);
+
+        if (index === currentZoomIndex) {
+          button.setAttribute('aria-current', 'page');
+        } else {
+          button.removeAttribute('aria-current');
+        }
+      });
+    }
+
+    // Build the thumbnail strip from the existing comic pages.
+    comicImages.forEach((image, index) => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.setAttribute('aria-label', `Page ${index + 1}`);
+
+      const thumbnail = document.createElement('img');
+      thumbnail.src = image.src;
+      thumbnail.alt = '';
+
+      button.appendChild(thumbnail);
+      button.addEventListener('click', () => showZoomPage(index));
+      thumbnails.appendChild(button);
+    });
+
+    // Open the selected page in the zoom viewer.
+    function openZoom(image) {
+      previousFocus = document.activeElement;
+
+      const index = comicImages.indexOf(image);
+      showZoomPage(index >= 0 ? index : 0);
+
+      viewer.classList.add('active');
+      document.getElementById('zoom-close').focus();
+    }
+
+    document.getElementById('zoom-prev-page').addEventListener('click', () => {
+      showZoomPage(currentZoomIndex - 1);
+    });
+
+    document.getElementById('zoom-next-page').addEventListener('click', () => {
+      showZoomPage(currentZoomIndex + 1);
+    });
+
+    // Optional: arrow keys navigate between pages while zoom mode is open.
+    document.addEventListener('keydown', event => {
+      if (!viewer.classList.contains('active')) return;
+
+      if (event.key === 'ArrowLeft') {
+        showZoomPage(currentZoomIndex - 1);
+      } else if (event.key === 'ArrowRight') {
+        showZoomPage(currentZoomIndex + 1);
+      }
+    });
+
+    updateZoomPageNavigation();
+
   pageFlip.loadFromHTML(document.querySelectorAll('.page'));
+
+    // Click any comic illustration to enlarge it.
+    document.querySelectorAll('.page img').forEach(image => {
+      image.addEventListener('click', () => openZoom(image));
+    });
+
+    document.getElementById('zoom-in').addEventListener('click', () => {
+      changeZoom(0.5);
+    });
+
+    document.getElementById('zoom-out').addEventListener('click', () => {
+      changeZoom(-0.5);
+    });
+
+    document.getElementById('zoom-reset').addEventListener('click', resetZoom);
+
+    document.getElementById('zoom-close').addEventListener('click', closeZoom);
+
+    // Click the dark background to close.
+    viewer.addEventListener('click', event => {
+      if (event.target === viewer) closeZoom();
+    });
+
+    // Escape closes the viewer.
+    document.addEventListener('keydown', event => {
+      if (!viewer.classList.contains('active')) return;
+
+      if (event.key === 'Escape') closeZoom();
+
+      if (event.key === '+' || event.key === '=') changeZoom(0.5);
+      if (event.key === '-') changeZoom(-0.5);
+    });
+
+    // Mouse wheel zoom.
+    viewer.addEventListener('wheel', event => {
+      if (!viewer.classList.contains('active')) return;
+
+      event.preventDefault();
+      changeZoom(event.deltaY < 0 ? 0.2 : -0.2);
+    }, { passive: false });
+
+    // Drag to inspect details when zoomed in.
+
+	  // ---- Drag and pinch-to-zoom ----
+	  const activePointers = new Map();
+
+	  let pinchStartDistance = 0;
+	  let pinchStartScale = 1;
+	  let pinchStartOffsetX = 0;
+	  let pinchStartOffsetY = 0;
+	  let pinchStartMidX = 0;
+	  let pinchStartMidY = 0;
+
+	  function getPointerDistance(a, b) {
+	    return Math.hypot(a.x - b.x, a.y - b.y);
+	  }
+
+	  function getPointerMidpoint(a, b) {
+	    return {
+	      x: (a.x + b.x) / 2,
+	      y: (a.y + b.y) / 2
+	    };
+	  }
+
+	  function startPinch() {
+	    const points = [...activePointers.values()];
+	    if (points.length < 2) return;
+
+	    pinchStartDistance = getPointerDistance(points[0], points[1]);
+	    pinchStartScale = scale;
+	    pinchStartOffsetX = offsetX;
+	    pinchStartOffsetY = offsetY;
+
+	    const midpoint = getPointerMidpoint(points[0], points[1]);
+	    pinchStartMidX = midpoint.x;
+	    pinchStartMidY = midpoint.y;
+	  }
+
+	  zoomImage.addEventListener('pointerdown', event => {
+	    event.preventDefault();
+
+	    zoomImage.setPointerCapture(event.pointerId);
+
+	    activePointers.set(event.pointerId, {
+	      x: event.clientX,
+	      y: event.clientY
+	    });
+
+	    if (activePointers.size === 2) {
+	      startPinch();
+	    } else if (activePointers.size === 1) {
+	      startX = event.clientX;
+	      startY = event.clientY;
+	      lastX = offsetX;
+	      lastY = offsetY;
+	    }
+	  });
+
+	  zoomImage.addEventListener('pointermove', event => {
+	    if (!activePointers.has(event.pointerId)) return;
+
+	    activePointers.set(event.pointerId, {
+	      x: event.clientX,
+	      y: event.clientY
+	    });
+
+	    const points = [...activePointers.values()];
+
+	    if (points.length >= 2) {
+	      // Two fingers: pinch to zoom.
+	      const distance = getPointerDistance(points[0], points[1]);
+	      const midpoint = getPointerMidpoint(points[0], points[1]);
+
+	      if (pinchStartDistance > 0) {
+	        const oldScale = scale;
+
+	        scale = Math.min(
+	          MAX_ZOOM,
+	          Math.max(
+	            MIN_ZOOM,
+	            pinchStartScale * distance / pinchStartDistance
+	          )
+	        );
+
+	        // Keep the zoom centered around the fingers.
+	        const ratio = scale / pinchStartScale;
+
+	        offsetX =
+	          midpoint.x - pinchStartMidX +
+	          ratio * pinchStartOffsetX;
+
+	        offsetY =
+	          midpoint.y - pinchStartMidY +
+	          ratio * pinchStartOffsetY;
+
+	        if (scale === MIN_ZOOM) {
+	          offsetX = 0;
+	          offsetY = 0;
+	        }
+
+	        updateZoom();
+	      }
+	    } else if (points.length === 1 && scale > MIN_ZOOM) {
+	      // One finger: drag the enlarged image.
+	      offsetX = lastX + event.clientX - startX;
+	      offsetY = lastY + event.clientY - startY;
+	      updateZoom();
+	    }
+	  });
+
+	  function endPointer(event) {
+	    // Ignore duplicate pointerup/lostpointercapture events.
+	    if (!activePointers.has(event.pointerId)) return;
+
+	    activePointers.delete(event.pointerId);
+
+	    if (activePointers.size >= 2) {
+	      startPinch();
+	    } else if (activePointers.size === 1) {
+	      const remaining = [...activePointers.values()][0];
+	      startX = remaining.x;
+	      startY = remaining.y;
+	      lastX = offsetX;
+	      lastY = offsetY;
+	    } else {
+	      pinchStartDistance = 0;
+	    }
+
+	    dragging = false;
+	    updateZoom();
+	  }
+
+	  // Open the full-screen reader on the cover immediately.
+	openZoom(comicImages[0]);
+	zoomImage.addEventListener('pointerup', endPointer);
+	zoomImage.addEventListener('pointercancel', endPointer);
+	zoomImage.addEventListener('lostpointercapture', endPointer);
 });
 </script>
 </head>
@@ -51,5 +586,38 @@ document.addEventListener('DOMContentLoaded', function() {
   <div class="page"><img src="Page_5.png" alt="Epilogue"></div>
   <div class="page"><img src="Backcover.png" alt="Backcover"></div>
 </div>
+
+<div id="page-navigation">
+  <button id="page-turn-button" type="button">
+    次へ →
+  </button>
+  <p>次へ →</p>
+</div>
+
+
+<div id="zoom-viewer" role="dialog"
+     aria-modal="true" aria-label="Comic page zoom viewer">
+
+  <div id="zoom-controls">
+    <button id="zoom-out" type="button" aria-label="Zoom out">−</button>
+    <button id="zoom-in" type="button" aria-label="Zoom in">＋</button>
+  </div>
+
+  <img id="zoom-image" alt="Enlarged comic page">
+
+  <div id="zoom-thumbnails" aria-label="Zoom"></div>
+
+  <div id="zoom-page-navigation">
+    <button id="zoom-prev-page" type="button">← Prev</button>
+    <span id="zoom-page-indicator">1 / 7</span>
+    <button id="zoom-next-page" type="button">Next →</button>
+  </div>
+
+  <div id="zoom-help">
+    Pinch or use +/− to zoom · Drag to move · Esc to close
+  </div>
+</div>
+
+
 </body>
 </html>
