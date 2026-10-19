@@ -372,16 +372,32 @@ a{color:#1f56c4}
         <small>${x.desc}</small>
         <div class="bar"><span style="width:${p[i]}%"></span></div>
       </div>`).join('');
-    const winner = dice[0] + dice[1] + dice[2] + dice[3];
-    // Use the dice sum to select an outcome; the probabilities remain the displayed model distribution.
-    // Treat the four ordered dice as one of 6^4 = 1,296 equally likely results.
-    // This makes the dice themselves determine the outcome, rather than rolling separately.
-    const comboIndex = (((dice[0]-1)*6 + (dice[1]-1))*6 + (dice[2]-1))*6 + (dice[3]-1);
-    const roll = (comboIndex / 1296) * 100;
-    let cum=0, idx=0;
-    for(let i=0;i<p.length;i++){cum+=p[i];if(roll<cum){idx=i;break;}}
-    document.getElementById('outcomeTitle').textContent = `${labels[idx].emoji} ${labels[idx].name}`;
-    document.getElementById('outcomeDesc').textContent = `Dice: ${dice.join(' · ')} (sum ${winner}). The outcome was drawn from the illustrative probability distribution above.`;
+    
+    // Treat the four dice as indistinguishable: sort their faces for display.
+    const sortedDice = [...dice].sort((a, b) => a - b);
+    const winner = sortedDice.reduce((sum, face) => sum + face, 0);
+
+    // Select the outcome using the displayed probability distribution.
+    // This is a weighted random draw, not an ordered-dice index.
+    const roll = Math.random() * 100;
+    let cumulative = 0;
+    let idx = p.length - 1;
+
+    for (let i = 0; i < p.length; i++) {
+      cumulative += p[i];
+      if (roll < cumulative) {
+        idx = i;
+        break;
+      }
+    }
+
+    document.getElementById('outcomeTitle').textContent =
+      `${labels[idx].emoji} ${labels[idx].name}`;
+
+    document.getElementById('outcomeDesc').textContent =
+      `Dice: ${sortedDice.join(' · ')} (sum ${winner}). ` +
+      `Outcome selected according to the displayed probability distribution.`;
+
     const tbody = document.getElementById('contributionRows');
     if(!rows.length){
       tbody.innerHTML='<tr><td>No non-zero adjustments</td><td class="neutral">0.000</td><td>Default settings in the simplified game.</td></tr>';
