@@ -77,7 +77,7 @@ a{color:#1f56c4}
   <header class="hero">
     <div>
       <div class="eyebrow">高校生向け科学ゲーム · ウイルス探偵</div>
-      <h1>COVID-19:<br>The Odds of an Outcome</h1>
+      <h1>COVID-19:<br>にかかったら、どんな経過をたどる？</h1>
       <p>SARS-CoV-2に接触したとき、感染予防、ワクチン接種、年齢、健康状態などがその後の経過にどう関係するかを調べよう。選択肢を選んで、サイコロを振ってみよう！</p>
     </div>
     <svg class="hero-art" viewBox="0 0 320 260" role="img" aria-label="かわいいウイルス、盾、サイコロのイラスト">
@@ -160,7 +160,7 @@ a{color:#1f56c4}
           <h3><span class="qicon">🗓️</span>最後の接種からの期間</h3>
           <div class="options">
             <label class="choice"><input type="radio" name="vaxTime" value="recent" checked> 6か月以内</label>
-            <label class="choice"><input type="radio" name="vaxTime" value="old"> More than 6 months</label>
+            <label class="choice"><input type="radio" name="vaxTime" value="old"> 6か月以上</label>
             <label class="choice"><input type="radio" name="vaxTime" value="none"> 未接種／不明</label>
           </div>
         </div>
@@ -179,7 +179,7 @@ a{color:#1f56c4}
         <div class="question">
           <h3><span class="qicon">🤧</span>現在の呼吸器感染症の合併</h3>
           <div class="options">
-            <label class="choice"><input type="radio" name="coinfection" value="none" checked> 未接種 known</label>
+            <label class="choice"><input type="radio" name="coinfection" value="none" checked> なし</label>
             <label class="choice"><input type="radio" name="coinfection" value="flu"> インフルエンザ</label>
             <label class="choice"><input type="radio" name="coinfection" value="other"> その他の呼吸器感染症</label>
             <label class="choice"><input type="radio" name="coinfection" value="unknown"> 不明</label>
@@ -198,7 +198,7 @@ a{color:#1f56c4}
           <div class="options">
             <label class="choice"><input type="radio" name="hands" value="often" checked> よくする</label>
             <label class="choice"><input type="radio" name="hands" value="sometimes"> ときどき</label>
-            <label class="choice"><input type="radio" name="hands" value="rarely"> Rarely</label>
+            <label class="choice"><input type="radio" name="hands" value="rarely"> たまに</label>
           </div>
           <p class="hint">COVID-19は主に空気中の粒子を介して広がりますが、手洗いは一般的な感染予防に役立ちます。</p>
         </div>
@@ -207,7 +207,7 @@ a{color:#1f56c4}
           <div class="options">
             <label class="choice"><input type="radio" name="diet" value="often" checked> ほとんど毎日</label>
             <label class="choice"><input type="radio" name="diet" value="sometimes"> ときどき</label>
-            <label class="choice"><input type="radio" name="diet" value="rarely"> Rarely</label>
+            <label class="choice"><input type="radio" name="diet" value="rarely"> たまに</label>
           </div>
         </div>
         <div class="question">
@@ -215,7 +215,7 @@ a{color:#1f56c4}
           <div class="options">
             <label class="choice"><input type="radio" name="exercise" value="often" checked> 定期的にする</label>
             <label class="choice"><input type="radio" name="exercise" value="sometimes"> ときどき</label>
-            <label class="choice"><input type="radio" name="exercise" value="rarely"> Rarely</label>
+            <label class="choice"><input type="radio" name="exercise" value="rarely"> たまに</label>
           </div>
         </div>
         <div class="question">
@@ -223,7 +223,7 @@ a{color:#1f56c4}
           <div class="options">
             <label class="choice"><input type="radio" name="sleep" value="often" checked> 通常8時間以上</label>
             <label class="choice"><input type="radio" name="sleep" value="sometimes"> ときどき</label>
-            <label class="choice"><input type="radio" name="sleep" value="rarely"> Rarely</label>
+            <label class="choice"><input type="radio" name="sleep" value="rarely"> たまに</label>
           </div>
         </div>
       </div>
@@ -262,7 +262,7 @@ a{color:#1f56c4}
     <div class="section-title"><div class="num">4</div><div><h2>何がわかったかな？</h2><p class="sub">感染を防ぐことと重症化の可能性を下げることは関連していますが、別の問題です。</p></div></div>
     <div class="panel">
       <div class="method-grid">
-        <div class="method-card"><div class="big">🛡️</div><strong>段階A：ウイルスへの接触と感染</strong><p class="hint">Vaccination and well-fitting masks can help reduce risk, but they do not make infection impossible. 手洗い is less central for a virus that mainly spreads through the air.</p></div>
+        <div class="method-card"><div class="big">🛡️</div><strong>段階A：ウイルスへの接触と感染</strong><p class="hint">ワクチン接種や顔にしっかりフィットするマスクは感染リスクを減らすのに役立ちますが、感染を完全に防げるわけではありません。ウイルスは主に空気を通じて広がるため、手洗いだけでは予防効果は限定的です。</p></div>
         <div class="method-card"><div class="big">❤️</div><strong>段階B：病気の重症度</strong><p class="hint">年齢、特定の健康状態、ワクチン接種状況は重症化リスクと関連しています。ただし、集団で見られる関連から個人の結果を予測することはできません。</p></div>
         <div class="method-card"><div class="big">✨</div><strong>プラセボ効果値（ゲーム上のボーナス）</strong><p class="hint">この簡易モデルで直接的な効果が確立していない生活習慣の項目には、ゲーム内だけの小さな「＋0.001」のボーナスを設定しています。実際の予防効果を示すものではありません。</p></div>
       </div>
@@ -372,56 +372,16 @@ a{color:#1f56c4}
         <small>${x.desc}</small>
         <div class="bar"><span style="width:${p[i]}%"></span></div>
       </div>`).join('');
-    // Treat the dice as indistinguishable: sort the faces.
-		    const sortedDice = [...dice].sort((a, b) => a - b);
-		    const winner = sortedDice.reduce((sum, face) => sum + face, 0);
-
-		    // Rank the sorted combination from 1 to 126.
-		    // Lexicographic order: 1-1-1-1 ... 6-6-6-6.
-		    function combinationRank(d) {
-  let rank = 1;
-
-  function countCombinations(minFace, slots) {
-    if (slots === 0) return 1;
-
-    let count = 0;
-    for (let face = minFace; face <= 6; face++) {
-      count += countCombinations(face, slots - 1);
-    }
-    return count;
-  }
-
-  for (let i = 0; i < 4; i++) {
-    const minAllowed = i === 0 ? 1 : d[i - 1];
-
-    for (let face = minAllowed; face < d[i]; face++) {
-      rank += countCombinations(face, 3 - i);
-    }
-  }
-
-  return rank;
-}
-		    const rank = combinationRank(sortedDice);
-		    const score = ((rank - 1) / 125) * 100;
-
-		    // Select the outcome from the cumulative displayed probabilities.
-		    let cumulative = 0;
-		    let idx = p.length - 1;
-
-		    for (let i = 0; i < p.length; i++) {
-		      cumulative += p[i];
-		      if (score < cumulative) {
-		        idx = i;
-		        break;
-		      }
-		    }
-
-		    document.getElementById('outcomeTitle').textContent =
-		      `${labels[idx].emoji} ${labels[idx].name}`;
-
-		    document.getElementById('outcomeDesc').textContent =
-      `Dice: ${sortedDice.join(' · ')} (sum ${winner}; combination rank ${rank}/126; score ${score.toFixed(1)}).`;
-
+    const winner = dice[0] + dice[1] + dice[2] + dice[3];
+    // Use the dice sum to select an outcome; the probabilities remain the displayed model distribution.
+    // Treat the four ordered dice as one of 6^4 = 1,296 equally likely results.
+    // This makes the dice themselves determine the outcome, rather than rolling separately.
+    const comboIndex = (((dice[0]-1)*6 + (dice[1]-1))*6 + (dice[2]-1))*6 + (dice[3]-1);
+    const roll = (comboIndex / 1296) * 100;
+    let cum=0, idx=0;
+    for(let i=0;i<p.length;i++){cum+=p[i];if(roll<cum){idx=i;break;}}
+    document.getElementById('outcomeTitle').textContent = `${labels[idx].emoji} ${labels[idx].name}`;
+    document.getElementById('outcomeDesc').textContent = `サイコロ：${dice.join(' · ')}（合計 ${winner}）。 結果は上の学習用確率分布に基づいて選ばれました。`;
     const tbody = document.getElementById('contributionRows');
     if(!rows.length){
       tbody.innerHTML='<tr><td>No non-zero adjustments</td><td class="neutral">0.000</td><td>Default settings in the simplified game.</td></tr>';
